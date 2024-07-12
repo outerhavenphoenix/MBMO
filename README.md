@@ -5,6 +5,8 @@ Description
 About
 
     I really just want redo the whole base system. But I had to settle doing it this way for now.
+    Hopefully in the future, I can figure out how to mod with C (which is what Fox engine is compiled in.)
+    There are hard set limits on some of these values (thanks Konami!!!!!!)
 
 Reminder
 
@@ -26,7 +28,8 @@ TO DO
     // Investigate if Konami designed development system to have additional requirements for resources. (It would seem as if they don't know how to use embedded tables or meta tables :( )
     // Seriouly, Konami, kids that develop *ROBLOX* games can code LUA better than you.
     
-    // Figure out what proccessingCount does
+    // Figure out what SetResourceSvars does, seems to be set in a debug function. 
+     Have to figure out the script load order or get a IH method of invoking this C function.
         TppMotherBaseManagement.SetResourceSvars{
             resource = "CommonMetal",
             usableCount = 100,
@@ -61,9 +64,9 @@ About the logic
         // Precious Metal: 780 GMP per unit (45%/84k)
 
     // More materials requirements (common, fuel, and biotic TBD others)
-        // BASE UPGRADES
-            // Each upgrade should take about 2 cycles (~4 hours) to achieve each (or until you build FOBs to add to proccessing rates).
-            // Grade 4 has +5 individual limits for mother base only (I'm considering adding more personnel space to other grads, due to.. cough... COVID-19/culling/plague in the game)
+        // MOTHER BASE UPGRADES
+              Each upgrade should take about 2 cycles (~4 hours) to achieve each (or until you build FOBs to add to proccessing rates).
+              Grade 4 has +5 individual limits for mother base only (I'm considering adding more personnel space to other grads, due to.. cough... COVID-19/culling/plague in the game)
             // Costs: 
                 // Grade 1: 1 period
                 // Grade 2: 4 periods
@@ -74,15 +77,35 @@ About the logic
                 // Grade 2: 30 minutes
                 // Grade 3: 40 minutes
                 // Grade 4: 10 minutes (Likely getting close to end of game.)
-        // FOB Modifier !!! TBD, I don't play online so I haven't throughly tested this yet.
-            // +15% on FOB base upgrades (each FOB will add ~%50 of total mother base proccesing output, AND whatever mining rates are set for each FOB).
+        // FOBs 
+          Future consideration, I don't play online, so not really going to change it.
+          Nor do I plan on buying coins to do this. Likely, I'll figure out how to allow offline FOBs when I can.
+          +15% on FOB base upgrades (each FOB will add ~%50 of total mother base proccesing output, AND whatever mining rates are set for each FOB).
 
+Resource Types
+
+    FuelResource
+    CommonMetal
+    BioticResource
+    MinorMetal
+    PreciousMetal
+
+Individual resources
+
+    // This registers the resource to the base system. The GMP value is also set here.
+    // Appears to be have max of 100 which is hardcoded into the engine.
+    TppMotherBaseManagement.RegisterResourceParam {
+        resource = "CommonMetal", --// Type
+        baseSalePrice = 10,       --// Value per unit
+        countInContainer = 100,   --// ???
+        countPer1Minute = 4       --// ???
+    }
 
 Automagic mining interval
 
-    // In order to payout, it requires mission progress. It will only pay out once until the game is progressed or registers a checkpoint.
+    // Will only pay out once until the game is "progressed" with a checkpoint.
     // Going by how Konami probably designed the "anti-AFK" system. I'd recommend keeping the interval within a time of a checkpoint. (between 5 and ~25 minutes)
-    // By default this is 1, so you really can't get any better than that.
+    // By default this is 1, but at that value it seems to pay out randomly at checkpoints.
     TppMotherBaseManagement.RegisterResourceBaseExtractingTimeMinute {
         timeMinute = 120 --// Time in minutes
     }
@@ -117,37 +140,23 @@ Processing time (of raw materials) PER base development rank function
         bioticResourceTimeMinute = 25 --// Time in minutes
     }
 
-GLOBAL proccessing rates (of raw materials)
+Global proccessing rates (of raw materials)
     
-    // This table effects ALL bases. These base amounts are redistributed by the engine.
-    // If my total is 1000 for all counts. Fuel being 100 and minor being 100, there is a chance ~5% (somewhere in 5%) is added/removed from each value. So, fuel output may be 95 and minor comes out to 105.
+    // This table effects ALL bases. 
+
+    // These base amounts are redistributed by the engine.
+    // If my total is 1000 for all counts. Fuel being 100 and minor being 100, there is a somewhere in 5% that will be added/removed from each value. So, fuel output may be 95 and minor comes out to 105.
     // This is done to vary the outputs so it's not always the same per material.
+
+    // At this time, it would seem as the engine prevents any proccessing count higher than 2500.
+
     TppMotherBaseManagement.RegisterContainerProcessingBasicParam {
-        commonMetalProcessCount = 2500,    --// Base amount of unrefined materials (max 2500 offline, 5000 online)
-        minorMetalProcessCount = 375,     --// Base amount of unrefined materials (max 2500 offline, 5000 online)
-        preciousMetalProcessCount = 75,   --// Base amount of unrefined materials (max 2500 offline, 5000 online)
-        fuelResourceProcessCount = 750,   --// Base amount of unrefined materials (max 2500 offline, 5000 online)
-        bioticResourceProcessCount = 750, --// Base amount of unrefined materials (max 2500 offline, 5000 online)
+        commonMetalProcessCount = 2500,    --// Base amount of unrefined materials (max 2500)
+        minorMetalProcessCount = 375,     --// Base amount of unrefined materials (max 2500)
+        preciousMetalProcessCount = 75,   --// Base amount of unrefined materials (max 2500)
+        fuelResourceProcessCount = 750,   --// Base amount of unrefined materials (max 2500)
+        bioticResourceProcessCount = 750, --// Base amount of unrefined materials (max 2500)
         fobRate = .15                     --// Percent added by each FOB. Essentially, if it's .15, each FOB will add ~15% to each value, at it's given rank and output time. (idk why Konami decided to use a decimal, all the other rates don't have it.)
-    }
-
-RESOURCE TYPES
-
-    FuelResource
-    CommonMetal
-    BioticResource
-    MinorMetal
-    PreciousMetal
-
-Individual resources
-
-    // This registers the resource to the base system. The GMP value is also set here.
-    // Appears to be have max of 100 which is hardcoded into the engine.
-    TppMotherBaseManagement.RegisterResourceParam {
-        resource = "CommonMetal", --// Type
-        baseSalePrice = 10,       --// Value per unit
-        countInContainer = 100,   --// ???
-        countPer1Minute = 4       --// ???
     }
 
 Shipping containers
