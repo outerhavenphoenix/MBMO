@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Outer Overhaul Modifications (OOM)" Version="1.6" Author="OuterHavenPhoenix" Website="https://www.nexusmods.com/metalgearsolidvtpp/mods/1281">
+  <MGSVersion Version="1.0.15.3" />
+  <SBVersion Version="0.0.0.0" />
+  <Description>Overhaul on resource production, proccessing, and mining.</Description>
+  <QarEntries />
+  <FpkEntries />
+  <FileEntries />
+  <WmvEntries />
+</ModEntry>
