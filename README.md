@@ -132,6 +132,7 @@ GLOBAL proccessing rates (of raw materials)
     }
 
 RESOURCE TYPES
+
     FuelResource
     CommonMetal
     BioticResource
@@ -139,6 +140,7 @@ RESOURCE TYPES
     PreciousMetal
 
 Individual resources
+
     // This registers the resource to the base system. The GMP value is also set here.
     // Appears to be have max of 100 which is hardcoded into the engine.
     TppMotherBaseManagement.RegisterResourceParam {
